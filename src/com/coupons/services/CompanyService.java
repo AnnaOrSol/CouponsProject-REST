@@ -1,5 +1,7 @@
 package com.coupons.services;
 
+import java.sql.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
@@ -10,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -28,7 +31,10 @@ import com.coupons.classesPOJO.ResponseCodes;
 public class CompanyService {
 
 	@Context
-	HttpServletRequest request;
+	private HttpServletRequest request;
+
+	public CompanyService() {
+	}
 
 	@Path("login")
 	@POST
@@ -40,18 +46,15 @@ public class CompanyService {
 					loginInfo.getPassword(), loginInfo.getUserType());
 			if (company == null)
 				return new ApplicationMessage(ResponseCodes.OTHER_ERROR,
-						"The information you have provided is not good.");
+						"The information you have provided is incorrect.");
 
 			HttpSession session = request.getSession();
 			session.setAttribute("facade", company);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success");
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Logged in successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
 
-	}
-
-	public CompanyService() {
 	}
 
 	@Path("coupon")
@@ -64,7 +67,7 @@ public class CompanyService {
 		System.out.println(coupon);
 		try {
 			company.createCoupon(coupon);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success");
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon has been created successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -80,7 +83,7 @@ public class CompanyService {
 
 		try {
 			company.removeCoupon(company.getCoupon(id));
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "coupon have been removed successfully");
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon have been removed successfully");
 
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
@@ -98,7 +101,7 @@ public class CompanyService {
 
 		try {
 			company.updateCoupon(coupon);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success");
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon updated successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -145,7 +148,33 @@ public class CompanyService {
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
+	}
+	
+	@GET
+	@Path("couponUpToDate")
+	@SessionFilterAnnotation
+	public Object getCouponUpToDate(@QueryParam("date") Date date) {
+		HttpSession session = request.getSession();
+		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
 
+		try {
+			return company.getCouponsUpToDate(new java.util.Date(date.getTime()));
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
 	}
 
+	@GET
+	@Path("couponUpToPrice")
+	@SessionFilterAnnotation
+	public Object getCouponUpToPrice(@QueryParam("price") double price) {
+		HttpSession session = request.getSession();
+		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
+
+		try {
+			return company.getCouponsUpToPrice(price);
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
 }

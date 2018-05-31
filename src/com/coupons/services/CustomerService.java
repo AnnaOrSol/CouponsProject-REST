@@ -1,12 +1,12 @@
 package com.coupons.services;
 
-import java.util.Collection;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -17,6 +17,7 @@ import com.coupon.exception.MyException;
 import com.coupon.facade.CustomerFacade;
 import com.coupon.facade.UserType;
 import com.coupons.annotations.LoginFilterAnnotation;
+import com.coupons.annotations.SessionFilterAnnotation;
 import com.coupons.classesPOJO.ApplicationMessage;
 import com.coupons.classesPOJO.LoginInfo;
 import com.coupons.classesPOJO.ResponseCodes;
@@ -25,7 +26,10 @@ import com.coupons.classesPOJO.ResponseCodes;
 public class CustomerService {
 	
 	@Context
-	HttpServletRequest request;
+	private HttpServletRequest request;
+	
+	public CustomerService() {	}
+	
 	
 	@Path("login")
 	@POST
@@ -36,40 +40,73 @@ public class CustomerService {
 		CustomerFacade customer =(CustomerFacade) CouponSystemSingleton.getInstance().login(loginInfo.getUserName(),
 				loginInfo.getPassword(), UserType.CUSTOMER);
 		if (customer == null)
-			return new ApplicationMessage(ResponseCodes.OTHER_ERROR, "the information you have provided is not good.");
+			return new ApplicationMessage(ResponseCodes.OTHER_ERROR, "The information you have provided is incorrect.");
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("facade" , customer);
-		return new ApplicationMessage(ResponseCodes.SUCCESS, "Success");
+		return new ApplicationMessage(ResponseCodes.SUCCESS, "Logged in successfully.");
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}	
+	
+	@POST
+	@Path("coupon")
+	@Produces(MediaType.APPLICATION_JSON)
+	@SessionFilterAnnotation
+	public Object purchaseCoupon (Coupon coupon) {
+		HttpSession session = request.getSession();
+		CustomerFacade customer = (CustomerFacade) session.getAttribute("facade");
+		System.out.println(coupon);
+		try {
+			customer.purchaseCoupon(coupon);
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon has been purchased successfully.");
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
+	
+	
+	@GET
+	@Path("coupon")
+	@Produces(MediaType.APPLICATION_JSON)
+	@SessionFilterAnnotation
+	public Object getAllPurchasedCoupons () {
+		HttpSession session = request.getSession();
+		CustomerFacade customer = (CustomerFacade) session.getAttribute("facade");
+		try {
+			return customer.getAllPurchasedCoupons();
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
+	
+	@GET
+	@Path("couponByType")
+	@Produces(MediaType.APPLICATION_JSON)
+	@SessionFilterAnnotation
+    public Object getAllPurchasedCouponsByType (@QueryParam("type") CouponType couponType) {
+    	HttpSession session = request.getSession();
+		CustomerFacade customer = (CustomerFacade) session.getAttribute("facade");
+		try {
+			return customer.getAllPurchasedCouponsByType(couponType);
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
 	}
 
-	public CustomerService() {	
-	}
-	
-	
-	
-	public void purchaseCoupon (Coupon coupon) {
-		
-	}
-	
-	
-	public Collection<Coupon> getAllPurchasedCoupons () {
-		
-		return null;
-	}
-	
-	
-    public Collection<Coupon> getAllPurchasedCouponsByType (CouponType couponType) {
-		
-		return null;
-	}
-
-    public Collection<Coupon> getAllPurchasedCouponsByPrice (double price) {
-	
-	return null;
+	@GET
+	@Path("couponByPrice")
+	@Produces(MediaType.APPLICATION_JSON)
+	@SessionFilterAnnotation
+    public Object getAllPurchasedCouponsByPrice (@QueryParam("price") double price) {
+    	HttpSession session = request.getSession();
+		CustomerFacade customer = (CustomerFacade) session.getAttribute("facade");
+		try {
+			return customer.getAllPurchasedCouponsByPrice(price);
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
     }
 	
 	

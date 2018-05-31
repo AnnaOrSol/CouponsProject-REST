@@ -29,15 +29,8 @@ import com.coupons.classesPOJO.ResponseCodes;
 public class AdminService {
 
 	@Context
-	HttpServletRequest request;
+	private HttpServletRequest request;
 
-	// http://localhost:8080/CouponsWeb2018/rest/AdminService/login
-	// Angular 4
-	// http:HttpClient @angular/common/http
-	// return
-	// this.http.post("http://localhost:8080/CouponsWeb2018/rest/AdminService/login",
-	// {userName: "123", password: "1234", userType: "ADMIN"}, {withCredentials:
-	// true});
 	@Path("login")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -47,11 +40,11 @@ public class AdminService {
 			AdminFacade admin = (AdminFacade) CouponSystemSingleton.getInstance().login(loginInfo.getUserName(),
 					loginInfo.getPassword(), UserType.ADMIN);
 			if (admin == null)
-				return new ApplicationMessage(ResponseCodes.OTHER_ERROR, "The information you have provided is not good." );
+				return new ApplicationMessage(ResponseCodes.OTHER_ERROR, "The information you have provided is incorrect." );
 
 			HttpSession session = request.getSession();
 			session.setAttribute("facade", admin);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Logged in successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -67,13 +60,12 @@ public class AdminService {
 
 		try {
 			admin.createCompany(company);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Company created successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
 	}
 
-	// return this.http.delete("url/123", { withCredentials: true});
 	@Path("company/{id}")
 	@DELETE
 	@Consumes(MediaType.TEXT_PLAIN)
@@ -84,7 +76,7 @@ public class AdminService {
 
 		try {
 			admin.removeCompany(admin.getCompany(id));
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Company removed successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -100,7 +92,7 @@ public class AdminService {
 
 		try {
 			admin.updateCompany(company);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Company updated successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -144,7 +136,7 @@ public class AdminService {
 		AdminFacade admin = (AdminFacade) session.getAttribute("facade");
 		try {
 			admin.createCustomer(customer);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "Success") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Customer created successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -159,7 +151,7 @@ public class AdminService {
 		AdminFacade admin = (AdminFacade) session.getAttribute("facade");
 		try {
 			admin.removeCustomer(admin.getCustomer(id));
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "customer has been removed successfuly.") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Customer has been removed successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -174,7 +166,7 @@ public class AdminService {
 		AdminFacade admin = (AdminFacade) session.getAttribute("facade");
 		try {
 			admin.updateCustomer(customer);
-			return new ApplicationMessage(ResponseCodes.SUCCESS, "customer has been updated successfuly.") ;
+			return new ApplicationMessage(ResponseCodes.SUCCESS, "Customer has been updated successfully.") ;
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}

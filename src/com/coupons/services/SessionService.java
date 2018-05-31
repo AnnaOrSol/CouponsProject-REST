@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
 import com.coupon.facade.AdminFacade;
+import com.coupon.facade.CompanyFacade;
 import com.coupon.facade.UserType;
 
 @Path("SessionService")
@@ -28,7 +29,7 @@ public class SessionService {
 			return UserType.GUEST;
 		if(session.getAttribute("facade") instanceof AdminFacade) 
 			return UserType.ADMIN;
-		if(session.getAttribute("facade") instanceof AdminFacade) 
+		if(session.getAttribute("facade") instanceof CompanyFacade) 
 			return UserType.COMPANY;
 		return UserType.CUSTOMER;
 	}
