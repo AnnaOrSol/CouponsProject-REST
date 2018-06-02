@@ -1,7 +1,5 @@
 package com.coupons.services;
 
-import java.sql.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
@@ -24,6 +22,7 @@ import com.coupon.facade.CompanyFacade;
 import com.coupon.facade.UserType;
 import com.coupons.annotations.LoginFilterAnnotation;
 import com.coupons.annotations.SessionFilterAnnotation;
+import com.coupons.business_delegate.BusinessDelegate;
 import com.coupons.classesPOJO.ApplicationMessage;
 import com.coupons.classesPOJO.LoginInfo;
 import com.coupons.classesPOJO.ResponseCodes;
@@ -68,6 +67,8 @@ public class CompanyService {
 		System.out.println(coupon);
 		try {
 			company.createCoupon(coupon);
+			BusinessDelegate.BusinessDelegate.storeIncome(company.getCurrentCompanyInformation().getCompName(), "COMPANY_NEW_COUPON",
+					100, UserType.COMPANY);
 			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon has been created successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
@@ -102,6 +103,8 @@ public class CompanyService {
 
 		try {
 			company.updateCoupon(coupon);
+			BusinessDelegate.BusinessDelegate.storeIncome(company.getCurrentCompanyInformation().getCompName(), "COMPANY_UPDATE_COUPON",
+					10, UserType.COMPANY);
 			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon updated successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
@@ -187,5 +190,18 @@ public class CompanyService {
 		HttpSession session = request.getSession();
 		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
 		return company.getCurrentCompanyInformation();
+	}
+	
+	@GET
+	@Path("income")
+	@SessionFilterAnnotation
+	public Object getCompanyIncomeInfo() {
+		HttpSession session = request.getSession();
+		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
+		try {
+			return BusinessDelegate.BusinessDelegate.viewIncomeByCompany(company.getCurrentCompanyInformation().getCompName());
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
 	}
 }

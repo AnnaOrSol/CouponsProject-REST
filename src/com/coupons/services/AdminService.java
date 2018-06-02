@@ -10,6 +10,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -21,6 +22,7 @@ import com.coupon.facade.AdminFacade;
 import com.coupon.facade.UserType;
 import com.coupons.annotations.LoginFilterAnnotation;
 import com.coupons.annotations.SessionFilterAnnotation;
+import com.coupons.business_delegate.BusinessDelegate;
 import com.coupons.classesPOJO.ApplicationMessage;
 import com.coupons.classesPOJO.LoginInfo;
 import com.coupons.classesPOJO.ResponseCodes;
@@ -195,6 +197,39 @@ public class AdminService {
 		AdminFacade admin = (AdminFacade) session.getAttribute("facade");
 		try {
 			return admin.getAllCustomers();
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
+	
+	@Path("income")
+	@GET
+	@SessionFilterAnnotation
+	public Object getAllIncome() {
+		try {
+			return BusinessDelegate.BusinessDelegate.viewAllIncome();
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
+	
+	@Path("income/company")
+	@GET
+	@SessionFilterAnnotation
+	public Object getIncomeByCompany(@QueryParam("name") String name) {
+		try {
+			return BusinessDelegate.BusinessDelegate.viewIncomeByCompany(name);
+		} catch (MyException e) {
+			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
+		}
+	}
+	
+	@Path("income/customer")
+	@GET
+	@SessionFilterAnnotation
+	public Object getIncomeByCustomer(@QueryParam("name") String name) {
+		try {
+			return BusinessDelegate.BusinessDelegate.viewIncomeByCustomer(name);
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}

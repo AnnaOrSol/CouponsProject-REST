@@ -18,6 +18,7 @@ import com.coupon.facade.CustomerFacade;
 import com.coupon.facade.UserType;
 import com.coupons.annotations.LoginFilterAnnotation;
 import com.coupons.annotations.SessionFilterAnnotation;
+import com.coupons.business_delegate.BusinessDelegate;
 import com.coupons.classesPOJO.ApplicationMessage;
 import com.coupons.classesPOJO.LoginInfo;
 import com.coupons.classesPOJO.ResponseCodes;
@@ -60,6 +61,8 @@ public class CustomerService {
 		System.out.println(coupon);
 		try {
 			customer.purchaseCoupon(coupon);
+			BusinessDelegate.BusinessDelegate.storeIncome(customer.getCustomerInfo().getCustName(), "CUSTOMER_PURCHASE",
+					coupon.getPrice(), UserType.CUSTOMER);
 			return new ApplicationMessage(ResponseCodes.SUCCESS, "Coupon has been purchased successfully.");
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
