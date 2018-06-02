@@ -180,7 +180,7 @@ public class AdminService {
 		HttpSession session = request.getSession();
 		AdminFacade admin = (AdminFacade) session.getAttribute("facade");
 		try {
-			return admin.getCompany(id);
+			return admin.getCustomer(id);
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}

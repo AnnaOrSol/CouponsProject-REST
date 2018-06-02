@@ -6,9 +6,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
+import com.coupon.exception.MyException;
 import com.coupon.facade.AdminFacade;
 import com.coupon.facade.CompanyFacade;
+import com.coupon.facade.StoreFacade;
 import com.coupon.facade.UserType;
+import com.coupons.classesPOJO.ApplicationMessage;
 
 @Path("SessionService")
 public class SessionService {
@@ -32,6 +35,16 @@ public class SessionService {
 		if(session.getAttribute("facade") instanceof CompanyFacade) 
 			return UserType.COMPANY;
 		return UserType.CUSTOMER;
+	}
+	
+	@GET
+	@Path("Store")
+	public Object getStore() {
+		try {
+			return new StoreFacade().getStore();
+		} catch (MyException e) {
+			return new ApplicationMessage(0, "There is a problem with the store.");
+		}
 	}
 	
 	

@@ -21,6 +21,7 @@ import com.coupon.beans.CouponType;
 import com.coupon.couponSystem.CouponSystemSingleton;
 import com.coupon.exception.MyException;
 import com.coupon.facade.CompanyFacade;
+import com.coupon.facade.UserType;
 import com.coupons.annotations.LoginFilterAnnotation;
 import com.coupons.annotations.SessionFilterAnnotation;
 import com.coupons.classesPOJO.ApplicationMessage;
@@ -43,7 +44,7 @@ public class CompanyService {
 	public Object login(LoginInfo loginInfo) {
 		try {
 			CompanyFacade company = (CompanyFacade) CouponSystemSingleton.getInstance().login(loginInfo.getUserName(),
-					loginInfo.getPassword(), loginInfo.getUserType());
+					loginInfo.getPassword(), UserType.COMPANY);
 			if (company == null)
 				return new ApplicationMessage(ResponseCodes.OTHER_ERROR,
 						"The information you have provided is incorrect.");
@@ -153,12 +154,13 @@ public class CompanyService {
 	@GET
 	@Path("couponUpToDate")
 	@SessionFilterAnnotation
-	public Object getCouponUpToDate(@QueryParam("date") Date date) {
+	public Object getCouponUpToDate(@QueryParam("date") long date) {
 		HttpSession session = request.getSession();
 		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
 
 		try {
-			return company.getCouponsUpToDate(new java.util.Date(date.getTime()));
+			System.out.println(new java.util.Date(date));
+			return company.getCouponsUpToDate(new java.util.Date(date));
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
@@ -176,5 +178,14 @@ public class CompanyService {
 		} catch (MyException e) {
 			return new ApplicationMessage(ResponseCodes.SYSTEM_EXCEPTION, e.getMessage());
 		}
+	}
+	
+	@GET
+	@Path("company")
+	@SessionFilterAnnotation
+	public Object getCompanyInformation() {
+		HttpSession session = request.getSession();
+		CompanyFacade company = (CompanyFacade) session.getAttribute("facade");
+		return company.getCurrentCompanyInformation();
 	}
 }

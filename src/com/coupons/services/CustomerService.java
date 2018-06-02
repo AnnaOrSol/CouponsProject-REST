@@ -110,7 +110,15 @@ public class CustomerService {
     }
 	
 	
-    
+    @GET
+    @Path("customerInfo")
+    @Produces(MediaType.APPLICATION_JSON)
+    @SessionFilterAnnotation
+    public Object getCustomerInfo() {
+    	HttpSession session = request.getSession();
+		CustomerFacade customer = (CustomerFacade) session.getAttribute("facade");
+		return customer.getCustomerInfo();
+    }
     
     
 	
